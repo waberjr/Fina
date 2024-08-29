@@ -9,6 +9,7 @@ public partial class IncomesByCategoryChartComponent : ComponentBase
 {
     #region Properties
 
+    public bool IsBusy { get; set; } = false;
     public List<double> Data { get; set; } = [];
     public List<string> Labels { get; set; } = [];
 
@@ -33,18 +34,31 @@ public partial class IncomesByCategoryChartComponent : ComponentBase
 
     private async Task GetIncomesByCategoryAsync()
     {
-        var request = new GetIncomesByCategoryRequest();
-        var result = await Handler.GetIncomesByCategoryReportAsync(request);
-        if (!result.IsSuccess || result.Data is null)
+        try
+        {
+            IsBusy = true;
+
+            var request = new GetIncomesByCategoryRequest();
+            var result = await Handler.GetIncomesByCategoryReportAsync(request);
+            if (!result.IsSuccess || result.Data is null)
+            {
+                Snackbar.Add("Falha ao obter dados do relatório", Severity.Error);
+                return;
+            }
+
+            foreach (var item in result.Data)
+            {
+                Labels.Add($"{item.Category} ({item.Incomes:C})");
+                Data.Add((double)item.Incomes);
+            }
+        }
+        catch (Exception ex)
         {
             Snackbar.Add("Falha ao obter dados do relatório", Severity.Error);
-            return;
         }
-
-        foreach (var item in result.Data)
+        finally
         {
-            Labels.Add($"{item.Category} ({item.Incomes:C})");
-            Data.Add((double)item.Incomes);
+            IsBusy = false;
         }
     }
 

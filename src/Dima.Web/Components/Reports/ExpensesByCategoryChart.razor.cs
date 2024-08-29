@@ -10,6 +10,7 @@ public partial class ExpensesByCategoryChartComponent : ComponentBase
 {
     #region Properties
 
+    public bool IsBusy { get; set; } = false;
     public List<double> Data { get; set; } = [];
     public List<string> Labels { get; set; } = [];
 
@@ -34,18 +35,31 @@ public partial class ExpensesByCategoryChartComponent : ComponentBase
 
     private async Task GetExpensesByCategoryAsync()
     {
-        var request = new GetExpensesByCategoryRequest();
-        var result = await Handler.GetExpensesByCategoryReportAsync(request);
-        if (!result.IsSuccess || result.Data is null)
+        try
+        {
+            IsBusy = true;
+
+            var request = new GetExpensesByCategoryRequest();
+            var result = await Handler.GetExpensesByCategoryReportAsync(request);
+            if (!result.IsSuccess || result.Data is null)
+            {
+                Snackbar.Add("Falha ao obter dados do relatório", Severity.Error);
+                return;
+            }
+
+            foreach (var item in result.Data)
+            {
+                Labels.Add($"{item.Category} ({item.Expenses:C})");
+                Data.Add(-(double)item.Expenses);
+            }
+        }
+        catch (Exception e)
         {
             Snackbar.Add("Falha ao obter dados do relatório", Severity.Error);
-            return;
         }
-
-        foreach (var item in result.Data)
+        finally
         {
-            Labels.Add($"{item.Category} ({item.Expenses:C})");
-            Data.Add(-(double)item.Expenses);
+            IsBusy = false;
         }
     }
 

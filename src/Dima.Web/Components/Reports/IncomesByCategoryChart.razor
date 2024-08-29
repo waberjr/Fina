@@ -1,7 +1,11 @@
 @inherits IncomesByCategoryChartComponent
 
-@if (Data.Count > 0)
+@if (!IsBusy)
 {
+    if (Data.Count == 0)
+    {
+        <span>Nenhum dado encontrado.</span>
+    }
     <MudChart
         ChartType="ChartType.Pie"
         InputData="@Data.ToArray()"
