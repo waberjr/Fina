@@ -1,5 +1,6 @@
 using Dima.Api;
 using Dima.Api.Common.Api;
+using Dima.Api.Data;
 using Dima.Api.Endpoints;
 using Dima.Core;
 
@@ -12,6 +13,8 @@ builder.AddDocumentation();
 builder.AddServices();
 
 var app = builder.Build();
+
+await app.InitialiseDatabaseAsync();
 
 if (app.Environment.IsDevelopment())
     app.ConfigureDevEnvironment();

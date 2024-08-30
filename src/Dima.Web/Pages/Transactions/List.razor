@@ -58,6 +58,7 @@
     </ToolBarContent>
     <Columns>
         <PropertyColumn Property="x => x.Title" Title="Lançamento"/>
+        <PropertyColumn Property="x => x.Category.Title" Title="Categoria"/>
         <TemplateColumn Title="Tipo" Filterable="true">
             <CellTemplate>
                 @if (context.Item.Type == ETransactionType.Deposit)

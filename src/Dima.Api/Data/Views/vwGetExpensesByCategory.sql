@@ -1,20 +1,15 @@
 CREATE OR ALTER VIEW [vwGetExpensesByCategory] AS
-    SELECT
-        [Transaction].[UserId],
-        [Category].[Title] AS [Category],
-        YEAR([Transaction].[PaidOrReceivedAt]) AS [Year],
-        SUM([Transaction].[Amount]) AS [Expenses]
-    FROM
-        [Transaction]
-            INNER JOIN [Category]
-                       ON [Transaction].[CategoryId] = [Category].[Id]
-    WHERE
-        [Transaction].[PaidOrReceivedAt]
-            >= DATEADD(MONTH, -11, CAST(GETDATE() AS DATE))
-      AND [Transaction].[PaidOrReceivedAt]
-        < DATEADD(MONTH, 1, CAST(GETDATE() AS DATE))
-      AND [Transaction].[Type] = 2
-    GROUP BY
-        [Transaction].[UserId],
-        [Category].[Title],
-        YEAR([Transaction].[PaidOrReceivedAt])
+SELECT [Transactions].[UserId],
+    [Categories].[Title]                    AS [Category],
+    YEAR([Transactions].[PaidOrReceivedAt]) AS [Year],
+    SUM([Transactions].[Amount])            AS [Expenses]
+FROM [Transactions]
+    INNER JOIN [Categories] ON [Transactions].[CategoryId] = [Categories].[Id]
+WHERE [Transactions].[PaidOrReceivedAt]
+    >= DATEADD(MONTH, -11, CAST(GETDATE() AS DATE))
+  AND [Transactions].[PaidOrReceivedAt]
+    < DATEADD(MONTH, 1, CAST(GETDATE() AS DATE))
+  AND [Transactions].[Type] = 2
+GROUP BY [Transactions].[UserId],
+    [Categories].[Title],
+    YEAR([Transactions].[PaidOrReceivedAt])

@@ -94,7 +94,7 @@ public partial class EditTransactionPage : ComponentBase
             {
                 InputModel = new UpdateTransactionRequest
                 {
-                    CategoryId = result.Data.CategoryId,
+                    CategoryId = result.Data.Category.Id,
                     PaidOrReceivedAt = result.Data.PaidOrReceivedAt,
                     Title = result.Data.Title,
                     Type = result.Data.Type,

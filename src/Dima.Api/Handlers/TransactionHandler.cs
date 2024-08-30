@@ -14,15 +14,21 @@ public class TransactionHandler(AppDbContext context) : ITransactionHandler
 {
     public async Task<Response<Transaction?>> CreateAsync(CreateTransactionRequest request)
     {
-        if (request is { Type: ETransactionType.Withdraw, Amount: >= 0 }) 
-            request.Amount *= -1;
-
         try
         {
+            if (request is { Type: ETransactionType.Withdraw, Amount: >= 0 })
+                request.Amount *= -1;
+
+            var category = await context.Categories.FindAsync(request.CategoryId);
+            if (category is null)
+            {
+                return new Response<Transaction?>(null, 400, "Categoria não encontrada");
+            }
+
             var transaction = new Transaction
             {
                 UserId = request.UserId,
-                CategoryId = request.CategoryId,
+                Category = category,
                 CreatedAt = DateTime.Now,
                 Amount = request.Amount,
                 PaidOrReceivedAt = request.PaidOrReceivedAt,
@@ -35,7 +41,7 @@ public class TransactionHandler(AppDbContext context) : ITransactionHandler
 
             return new Response<Transaction?>(transaction, 201, "Transação criada com sucesso!");
         }
-        catch
+        catch (Exception e)
         {
             return new Response<Transaction?>(null, 500, "Não foi possível criar sua transação");
         }
@@ -43,11 +49,17 @@ public class TransactionHandler(AppDbContext context) : ITransactionHandler
 
     public async Task<Response<Transaction?>> UpdateAsync(UpdateTransactionRequest request)
     {
-        if (request is { Type: ETransactionType.Withdraw, Amount: >= 0 }) 
-            request.Amount *= -1;
-        
         try
         {
+            if (request is { Type: ETransactionType.Withdraw, Amount: >= 0 })
+                request.Amount *= -1;
+
+            var category = await context.Categories.FindAsync(request.CategoryId);
+            if (category is null)
+            {
+                return new Response<Transaction?>(null, 400, "Categoria não encontrada");
+            }
+
             var transaction = await context
                 .Transactions
                 .FirstOrDefaultAsync(x => x.Id == request.Id && x.UserId == request.UserId);
@@ -55,7 +67,7 @@ public class TransactionHandler(AppDbContext context) : ITransactionHandler
             if (transaction is null)
                 return new Response<Transaction?>(null, 404, "Transação não encontrada");
 
-            transaction.CategoryId = request.CategoryId;
+            transaction.Category = category;
             transaction.Amount = request.Amount;
             transaction.Title = request.Title;
             transaction.Type = request.Type;
@@ -100,6 +112,7 @@ public class TransactionHandler(AppDbContext context) : ITransactionHandler
         {
             var transaction = await context
                 .Transactions
+                .Include(e => e.Category)
                 .FirstOrDefaultAsync(x => x.Id == request.Id && x.UserId == request.UserId);
 
             return transaction is null
@@ -129,6 +142,7 @@ public class TransactionHandler(AppDbContext context) : ITransactionHandler
         {
             var query = context
                 .Transactions
+                .Include(e => e.Category)
                 .AsNoTracking()
                 .Where(x =>
                     x.PaidOrReceivedAt >= request.StartDate &&

@@ -30,16 +30,22 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
-        modelBuilder.Entity<IncomesAndExpenses>()
-            .HasNoKey()
-            .ToView("vwGetIncomesAndExpenses");
+        ConfigureDecimalProps(modelBuilder);
 
-        modelBuilder.Entity<IncomesByCategory>()
-            .HasNoKey()
-            .ToView("vwGetIncomesByCategory");
+        base.OnModelCreating(modelBuilder);
+    }
 
-        modelBuilder.Entity<ExpensesByCategory>()
-            .HasNoKey()
-            .ToView("vwGetExpensesByCategory");
+    private void ConfigureDecimalProps(ModelBuilder builder)
+    {
+        var decimalProps = builder.Model
+            .GetEntityTypes()
+            .SelectMany(t => t.GetProperties())
+            .Where(p => (System.Nullable.GetUnderlyingType(p.ClrType) ?? p.ClrType) == typeof(decimal));
+
+        foreach (var property in decimalProps)
+        {
+            property.SetPrecision(18);
+            property.SetScale(2);
+        }
     }
 }

@@ -47,6 +47,10 @@ public static class BuilderExtension
             .Services
             .AddDbContext<AppDbContext>(
                 x => { x.UseSqlServer(Configuration.ConnectionString); });
+
+        builder.Services
+            .AddScoped<AppDbContextInitializer>();
+
         builder.Services
             .AddIdentityCore<User>()
             .AddRoles<IdentityRole<long>>()
