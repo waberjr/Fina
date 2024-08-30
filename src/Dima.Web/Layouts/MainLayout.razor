@@ -18,8 +18,7 @@
                     OnClick="ToggleDrawer"/>
                 Dima
                 <MudSpacer/>
-                <MudButton Href="/lancamentos/novo" 
-                           Variant="Variant.Text" StartIcon="@Icons.TwoTone.Add">
+                <MudButton Href="/lancamentos/novo" Variant="Variant.Text" Color="Color.Inherit" StartIcon="@Icons.TwoTone.Add">
                     NOVO LANÇAMENTO
                 </MudButton>
                 <MudSpacer/>
@@ -49,7 +48,6 @@
 </AuthorizeView>
 
 @code {
-
     private bool _isDrawerOpened = true;
     private bool _isDarkMode = true;
     private MudThemeProvider _mudThemeProvider = null!;

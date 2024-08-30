@@ -32,6 +32,8 @@ public partial class LogoutPage : ComponentBase
             await Handler.LogoutAsync();
             await AuthenticationStateProvider.GetAuthenticationStateAsync();
             AuthenticationStateProvider.NotifyAuthenticationStateChanged();
+            NavigationManager.NavigateTo("/login");
+            Snackbar.Add("Você foi desconectado com sucesso!", Severity.Success);
         }
 
         await base.OnInitializedAsync();
