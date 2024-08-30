@@ -1,5 +1,6 @@
 using Dima.Api.Data;
 using Dima.Api.Handlers;
+using Dima.Api.Identity;
 using Dima.Api.Models;
 using Dima.Core;
 using Dima.Core.Handlers;
@@ -56,6 +57,8 @@ public static class BuilderExtension
             .AddRoles<IdentityRole<long>>()
             .AddEntityFrameworkStores<AppDbContext>()
             .AddApiEndpoints();
+
+        builder.Services.AddScoped<UserManager<User>, CustomUserManager>();
     }
 
     public static void AddCrossOrigin(this WebApplicationBuilder builder)
