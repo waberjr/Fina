@@ -17,10 +17,7 @@ public class GetIncomesAndExpensesEndpoint : IEndpoint
         ClaimsPrincipal user,
         IReportHandler handler)
     {
-        var request = new GetIncomesAndExpensesRequest
-        {
-            UserId = user.Identity?.Name ?? string.Empty
-        };
+        var request = new GetIncomesAndExpensesRequest();
         var result = await handler.GetIncomesAndExpensesReportAsync(request);
         return result.IsSuccess
             ? TypedResults.Ok(result)

@@ -1,3 +1,4 @@
+using Dima.Api.Common.Identity;
 using Dima.Core;
 using Dima.Core.Handlers;
 using Dima.Core.Requests.Stripe;
@@ -6,13 +7,13 @@ using Stripe.Checkout;
 
 namespace Dima.Api.Handlers;
 
-public class StripeHandler : IStripeHandler
+public class StripeHandler(ICurrentUser currentUser) : IStripeHandler
 {
     public async Task<Response<string?>> CreateSessionAsync(CreateSessionRequest request)
     {
         var options = new SessionCreateOptions
         {
-            CustomerEmail = request.UserId,
+            CustomerEmail = currentUser.Email,
             PaymentIntentData = new SessionPaymentIntentDataOptions
             {
                 Metadata = new Dictionary<string, string>

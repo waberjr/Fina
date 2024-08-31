@@ -24,7 +24,6 @@ public class DeleteCategoryEndpoint : IEndpoint
     {
         var request = new DeleteCategoryRequest
         {
-            UserId = user.Identity?.Name ?? string.Empty,
             Id = id
         };
 

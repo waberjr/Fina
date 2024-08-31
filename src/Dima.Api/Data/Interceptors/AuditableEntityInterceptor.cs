@@ -33,7 +33,7 @@ public class AuditableEntityInterceptor(ICurrentUser user) : SaveChangesIntercep
             if (entry.State == EntityState.Added)
             {
                 entry.Entity.CreatedAt = _dateTimeNow;
-                entry.Entity.UserId = user.Email ?? string.Empty;
+                entry.Entity.UserEmail = user.Email ?? string.Empty;
             }
 
             if (entry.State == EntityState.Added || entry.State == EntityState.Modified || entry.HasChangedOwnedEntities())

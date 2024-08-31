@@ -18,8 +18,6 @@ public class CreateOrderEndpoint : IEndpoint
         IOrderHandler handler,
         CreateOrderRequest request)
     {
-        request.UserId = user.Identity?.Name ?? string.Empty;
-
         var result = await handler.CreateOrderAsync(request);
         return result.IsSuccess
             ? TypedResults.Created("", result)

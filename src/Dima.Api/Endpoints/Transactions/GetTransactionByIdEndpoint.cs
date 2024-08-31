@@ -24,7 +24,6 @@ public class GetTransactionByIdEndpoint : IEndpoint
     {
         var request = new GetTransactionByIdRequest
         {
-            UserId = user.Identity?.Name ?? string.Empty,
             Id = id
         };
 

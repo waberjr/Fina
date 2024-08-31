@@ -24,7 +24,6 @@ public class GetCategoryByIdEndpoint : IEndpoint
     {
         var request = new GetCategoryByIdRequest
         {
-            UserId = user.Identity?.Name ?? string.Empty,
             Id = id
         };
 

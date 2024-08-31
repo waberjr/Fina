@@ -12,6 +12,8 @@ public class CurrentUser : ICurrentUser
         _httpContextAccessor = httpContextAccessor;
     }
 
-    public int? Id => Convert.ToInt32(_httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier));
+    public long? Id => Convert.ToInt32(_httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier));
     public string? Email => _httpContextAccessor.HttpContext?.User.Identity?.Name;
+
+    public ClaimsPrincipal? ClaimsPrincipal => _httpContextAccessor.HttpContext?.User;
 }

@@ -1,5 +1,5 @@
 CREATE OR ALTER VIEW [vwGetExpensesByCategory] AS
-SELECT [Transactions].[UserId],
+SELECT [Transactions].[UserEmail],
     [Categories].[Title]                    AS [Category],
     YEAR([Transactions].[PaidOrReceivedAt]) AS [Year],
     SUM([Transactions].[Amount])            AS [Expenses]
@@ -10,6 +10,6 @@ WHERE [Transactions].[PaidOrReceivedAt]
   AND [Transactions].[PaidOrReceivedAt]
     < DATEADD(MONTH, 1, CAST(GETDATE() AS DATE))
   AND [Transactions].[Type] = 2
-GROUP BY [Transactions].[UserId],
+GROUP BY [Transactions].[UserEmail],
     [Categories].[Title],
     YEAR([Transactions].[PaidOrReceivedAt])

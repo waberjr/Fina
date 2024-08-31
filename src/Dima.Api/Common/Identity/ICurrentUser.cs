@@ -1,7 +1,10 @@
-﻿namespace Dima.Api.Common.Identity;
+﻿using System.Security.Claims;
+
+namespace Dima.Api.Common.Identity;
 
 public interface ICurrentUser
 {
-    int? Id { get; }
+    long? Id { get; }
     string? Email { get; }
+    ClaimsPrincipal? ClaimsPrincipal { get; }
 }

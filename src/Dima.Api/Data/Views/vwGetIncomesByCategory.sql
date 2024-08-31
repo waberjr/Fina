@@ -1,6 +1,6 @@
 CREATE OR ALTER VIEW [vwGetIncomesByCategory] AS
 SELECT
-    [Transactions].[UserId],
+    [Transactions].[UserEmail],
     [Categories].[Title] AS [Category],
     YEAR([Transactions].[PaidOrReceivedAt]) AS [Year],
     SUM([Transactions].[Amount]) AS [Incomes]
@@ -15,6 +15,6 @@ WHERE
     < DATEADD(MONTH, 1, CAST(GETDATE() AS DATE))
   AND [Transactions].[Type] = 1
 GROUP BY
-    [Transactions].[UserId],
+    [Transactions].[UserEmail],
     [Categories].[Title],
     YEAR([Transactions].[PaidOrReceivedAt])

@@ -1,3 +1,4 @@
+using Dima.Api.Common.Identity;
 using Dima.Api.Data;
 using Dima.Core.Enums;
 using Dima.Core.Handlers;
@@ -13,7 +14,8 @@ namespace Dima.Api.Handlers;
 public class OrderHandler(
     AppDbContext context,
     UserManager<Models.User> userManager,
-    SignInManager<Models.User> signInManager) : IOrderHandler
+    SignInManager<Models.User> signInManager,
+    ICurrentUser currentUser) : IOrderHandler
 {
     public async Task<Response<Order?>> CreateOrderAsync(CreateOrderRequest request)
     {
@@ -24,7 +26,6 @@ public class OrderHandler(
                 CreatedAt = DateTime.Now,
                 ExternalReference = "",
                 Amount = 799.90M,
-                UserId = request.UserId,
                 Gateway = EPaymentGateway.Stripe,
                 Number = Guid.NewGuid().ToString()[0..8],
                 Status = EOrderStatus.WaitingPayment,
@@ -45,7 +46,7 @@ public class OrderHandler(
     public async Task<Response<Order?>> ConfirmOrderAsync(ConfirmOrderRequest request)
     {
         var order = await context.Orders.FirstOrDefaultAsync(x =>
-            x.UserId == request.UserId 
+            x.UserEmail == currentUser.Email
             && x.Number == request.Number);
 
         if (order is null)
@@ -79,7 +80,7 @@ public class OrderHandler(
         context.Orders.Update(order);
         await context.SaveChangesAsync();
 
-        var user = await userManager.FindByEmailAsync(request.UserId);
+        var user = await userManager.FindByEmailAsync(currentUser.Email ?? string.Empty);
         if (user is null)
             return new Response<Order?>(null, 500, "Perfil não encontrado");
 

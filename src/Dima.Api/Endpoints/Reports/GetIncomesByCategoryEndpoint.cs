@@ -17,10 +17,7 @@ public class GetIncomesByCategoryEndpoint : IEndpoint
         ClaimsPrincipal user,
         IReportHandler handler)
     {
-        var request = new GetIncomesByCategoryRequest
-        {
-            UserId = user.Identity?.Name ?? string.Empty
-        };
+        var request = new GetIncomesByCategoryRequest();
         var result = await handler.GetIncomesByCategoryReportAsync(request);
         return result.IsSuccess
             ? TypedResults.Ok(result)

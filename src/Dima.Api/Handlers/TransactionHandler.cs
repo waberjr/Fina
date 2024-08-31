@@ -1,3 +1,4 @@
+using Dima.Api.Common.Identity;
 using Dima.Api.Data;
 using Dima.Core.Common.Extensions;
 using Dima.Core.Enums;
@@ -10,7 +11,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Dima.Api.Handlers;
 
-public class TransactionHandler(AppDbContext context) : ITransactionHandler
+public class TransactionHandler(AppDbContext context, ICurrentUser currentUser) : ITransactionHandler
 {
     public async Task<Response<Transaction?>> CreateAsync(CreateTransactionRequest request)
     {
@@ -27,7 +28,6 @@ public class TransactionHandler(AppDbContext context) : ITransactionHandler
 
             var transaction = new Transaction
             {
-                UserId = request.UserId,
                 Category = category,
                 CreatedAt = DateTime.Now,
                 Amount = request.Amount,
@@ -62,7 +62,7 @@ public class TransactionHandler(AppDbContext context) : ITransactionHandler
 
             var transaction = await context
                 .Transactions
-                .FirstOrDefaultAsync(x => x.Id == request.Id && x.UserId == request.UserId);
+                .FirstOrDefaultAsync(x => x.Id == request.Id && x.UserEmail == currentUser.Email);
 
             if (transaction is null)
                 return new Response<Transaction?>(null, 404, "Transação não encontrada");
@@ -90,7 +90,7 @@ public class TransactionHandler(AppDbContext context) : ITransactionHandler
         {
             var transaction = await context
                 .Transactions
-                .FirstOrDefaultAsync(x => x.Id == request.Id && x.UserId == request.UserId);
+                .FirstOrDefaultAsync(x => x.Id == request.Id && x.UserEmail == currentUser.Email);
 
             if (transaction is null)
                 return new Response<Transaction?>(null, 404, "Transação não encontrada");
@@ -113,7 +113,7 @@ public class TransactionHandler(AppDbContext context) : ITransactionHandler
             var transaction = await context
                 .Transactions
                 .Include(e => e.Category)
-                .FirstOrDefaultAsync(x => x.Id == request.Id && x.UserId == request.UserId);
+                .FirstOrDefaultAsync(x => x.Id == request.Id && x.UserEmail == currentUser.Email);
 
             return transaction is null
                 ? new Response<Transaction?>(null, 404, "Transação não encontrada")
@@ -147,7 +147,7 @@ public class TransactionHandler(AppDbContext context) : ITransactionHandler
                 .Where(x =>
                     x.PaidOrReceivedAt >= request.StartDate &&
                     x.PaidOrReceivedAt <= request.EndDate &&
-                    x.UserId == request.UserId)
+                    x.UserEmail == currentUser.Email)
                 .OrderBy(x => x.PaidOrReceivedAt);
 
             var transactions = await query

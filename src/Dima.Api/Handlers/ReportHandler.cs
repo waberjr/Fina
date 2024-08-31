@@ -1,3 +1,4 @@
+using Dima.Api.Common.Identity;
 using Dima.Api.Data;
 using Dima.Core.Enums;
 using Dima.Core.Handlers;
@@ -8,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Dima.Api.Handlers;
 
-public class ReportHandler(AppDbContext context) : IReportHandler
+public class ReportHandler(AppDbContext context, ICurrentUser currentUser) : IReportHandler
 {
     public async Task<Response<List<IncomesAndExpenses>?>> GetIncomesAndExpensesReportAsync(
         GetIncomesAndExpensesRequest request)
@@ -18,7 +19,7 @@ public class ReportHandler(AppDbContext context) : IReportHandler
             var data = await context
                 .IncomesAndExpenses
                 .AsNoTracking()
-                .Where(x => x.UserId == request.UserId)
+                .Where(x => x.UserEmail == currentUser.Email)
                 .OrderByDescending(x => x.Year)
                 .ThenBy(x => x.Month)
                 .ToListAsync();
@@ -39,7 +40,7 @@ public class ReportHandler(AppDbContext context) : IReportHandler
             var data = await context
                 .IncomesByCategories
                 .AsNoTracking()
-                .Where(x => x.UserId == request.UserId)
+                .Where(x => x.UserEmail == currentUser.Email)
                 .OrderByDescending(x => x.Year)
                 .ThenBy(x => x.Category)
                 .ToListAsync();
@@ -61,7 +62,7 @@ public class ReportHandler(AppDbContext context) : IReportHandler
             var data = await context
                 .ExpensesByCategories
                 .AsNoTracking()
-                .Where(x => x.UserId == request.UserId)
+                .Where(x => x.UserEmail == currentUser.Email)
                 .OrderByDescending(x => x.Year)
                 .ThenBy(x => x.Category)
                 .ToListAsync();
@@ -84,20 +85,20 @@ public class ReportHandler(AppDbContext context) : IReportHandler
                 .Transactions
                 .AsNoTracking()
                 .Where(
-                    x => x.UserId == request.UserId
+                    x => x.UserEmail == currentUser.Email
                          && x.PaidOrReceivedAt >= startDate
                          && x.PaidOrReceivedAt <= DateTime.Now
                 )
                 .GroupBy(x => 1)
                 .Select(x => new FinancialSummary(
-                    request.UserId,
+                    currentUser.Email ?? string.Empty,
                     x.Where(ty => ty.Type == ETransactionType.Deposit).Sum(t => t.Amount),
                     x.Where(ty => ty.Type == ETransactionType.Withdraw).Sum(t => t.Amount))
                 )
                 .FirstOrDefaultAsync();
 
             return data is null
-                ? new Response<FinancialSummary?>(new FinancialSummary(request.UserId, 0, 0))
+                ? new Response<FinancialSummary?>(new FinancialSummary(currentUser.Email ?? string.Empty, 0, 0))
                 : new Response<FinancialSummary?>(data);
         }
         catch (Exception e)

@@ -24,7 +24,6 @@ public class DeleteTransactionEndpoint : IEndpoint
     {
         var request = new DeleteTransactionRequest
         {
-            UserId = user.Identity?.Name ?? string.Empty,
             Id = id
         };
         

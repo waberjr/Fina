@@ -18,8 +18,6 @@ public class ConfirmOrderEndpoint : IEndpoint
         IOrderHandler handler,
         ConfirmOrderRequest request)
     {
-        request.UserId = user.Identity?.Name ?? string.Empty;
-
         var result = await handler.ConfirmOrderAsync(request);
         return result.IsSuccess
             ? TypedResults.Ok(result)

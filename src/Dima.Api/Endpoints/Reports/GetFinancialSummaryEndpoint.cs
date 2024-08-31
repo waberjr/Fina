@@ -18,10 +18,7 @@ public class GetFinancialSummaryEndpoint : IEndpoint
         ClaimsPrincipal user,
         IReportHandler handler)
     {
-        var request = new GetFinancialSummaryRequest
-        {
-            UserId = user.Identity?.Name ?? string.Empty
-        };
+        var request = new GetFinancialSummaryRequest();
         var result = await handler.GetFinancialSummaryReportAsync(request);
         return result.IsSuccess
             ? TypedResults.Ok(result)

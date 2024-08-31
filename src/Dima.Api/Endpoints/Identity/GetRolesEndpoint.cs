@@ -1,10 +1,11 @@
 using System.Security.Claims;
 using Dima.Api.Common.Api;
+using Dima.Api.Common.Identity;
 using Dima.Core.Models.Account;
 
 namespace Dima.Api.Endpoints.Identity;
 
-public class GetRolesEndpoint : IEndpoint
+public class GetRolesEndpoint(ICurrentUser currentUser) : IEndpoint
 {
     public static void Map(IEndpointRouteBuilder app)
         => app

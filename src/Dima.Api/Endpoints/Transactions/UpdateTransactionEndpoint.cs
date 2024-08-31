@@ -23,7 +23,6 @@ public class UpdateTransactionEndpoint : IEndpoint
         UpdateTransactionRequest request,
         long id)
     {
-        request.UserId = user.Identity?.Name ?? string.Empty;
         request.Id = id;
         
         var result = await handler.UpdateAsync(request);

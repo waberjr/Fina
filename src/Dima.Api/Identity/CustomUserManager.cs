@@ -1,4 +1,5 @@
-﻿using Dima.Api.Data;
+﻿using Dima.Api.Common.Identity;
+using Dima.Api.Data;
 using Dima.Api.Models;
 using Dima.Core.Models;
 using EFCore.BulkExtensions;
@@ -10,6 +11,7 @@ namespace Dima.Api.Identity;
 public class CustomUserManager : UserManager<User>
 {
     private readonly AppDbContext _context;
+    private readonly ICurrentUser _currentUser;
 
     public CustomUserManager(
         IUserStore<User> store,
@@ -21,11 +23,13 @@ public class CustomUserManager : UserManager<User>
         IdentityErrorDescriber errors,
         IServiceProvider services,
         ILogger<UserManager<User>> logger,
-        AppDbContext context)
+        AppDbContext context,
+        ICurrentUser currentUser)
         : base(store, optionsAccessor, passwordHasher, userValidators, passwordValidators, keyNormalizer, errors,
             services, logger)
     {
         _context = context;
+        _currentUser = currentUser;
     }
 
     public override async Task<IdentityResult> CreateAsync(User user, string password)
@@ -57,7 +61,7 @@ public class CustomUserManager : UserManager<User>
             "Viagem"
         ];
         var userCategories = categories
-            .Select(category => new Category { UserId = user.Email!, Title = category })
+            .Select(category => new Category { UserEmail = _currentUser.Email ?? string.Empty, Title = category })
             .ToList();
 
         await _context.BulkInsertAsync(userCategories, cancellationToken: cancellationToken);

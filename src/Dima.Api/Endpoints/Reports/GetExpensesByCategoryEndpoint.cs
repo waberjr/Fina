@@ -17,10 +17,7 @@ public class GetExpensesByCategoryEndpoint : IEndpoint
         ClaimsPrincipal user,
         IReportHandler handler)
     {
-        var request = new GetExpensesByCategoryRequest
-        {
-            UserId = user.Identity?.Name ?? string.Empty
-        };
+        var request = new GetExpensesByCategoryRequest();
         var result = await handler.GetExpensesByCategoryReportAsync(request);
         return result.IsSuccess
             ? TypedResults.Ok(result)

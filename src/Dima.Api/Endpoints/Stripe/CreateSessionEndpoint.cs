@@ -18,8 +18,6 @@ public class CreateSessionEndpoint : IEndpoint
         IStripeHandler handler,
         CreateSessionRequest request)
     {
-        request.UserId = user.Identity?.Name ?? string.Empty;
-
         var result = await handler.CreateSessionAsync(request);
         return result.IsSuccess
             ? TypedResults.Ok(result)
