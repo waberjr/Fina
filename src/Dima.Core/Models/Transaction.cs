@@ -1,10 +1,10 @@
 using Dima.Core.Enums;
+using Dima.Core.Models.Common;
 
 namespace Dima.Core.Models;
 
-public class Transaction : BaseEntity
+public class Transaction : BaseAuditableEntity
 {
-    public long Id { get; set; }
     public string Title { get; set; } = string.Empty;
 
     public DateTime? PaidOrReceivedAt { get; set; }

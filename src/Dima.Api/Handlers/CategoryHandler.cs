@@ -1,3 +1,4 @@
+using Dima.Api.Common.Identity;
 using Dima.Api.Data;
 using Dima.Core.Handlers;
 using Dima.Core.Models;
@@ -7,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Dima.Api.Handlers;
 
-public class CategoryHandler(AppDbContext context) : ICategoryHandler
+public class CategoryHandler(AppDbContext context, ICurrentUser currentUser) : ICategoryHandler
 {
     public async Task<Response<Category?>> CreateAsync(CreateCategoryRequest request)
     {
@@ -15,7 +16,6 @@ public class CategoryHandler(AppDbContext context) : ICategoryHandler
         {
             var category = new Category
             {
-                UserId = request.UserId,
                 Title = request.Title,
                 Description = request.Description
             };

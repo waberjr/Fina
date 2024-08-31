@@ -1,8 +1,9 @@
+using Dima.Core.Models.Common;
+
 namespace Dima.Core.Models;
 
-public class Category : BaseEntity
+public class Category : BaseAuditableEntity
 {
-    public long Id { get; set; }
     public string Title { get; set; } = string.Empty;
     public string? Description { get; set; }
 }

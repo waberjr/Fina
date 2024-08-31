@@ -1,10 +1,10 @@
 using Dima.Core.Enums;
+using Dima.Core.Models.Common;
 
 namespace Dima.Core.Models;
 
-public class Order : BaseEntity
+public class Order : BaseAuditableEntity
 {
-    public long Id { get; set; }
     public string Number { get; set; } = string.Empty;
     public string ExternalReference { get; set; } = string.Empty;
     public EOrderStatus Status { get; set; } = EOrderStatus.WaitingPayment;

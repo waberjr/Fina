@@ -28,7 +28,7 @@ public class OrderHandler(
                 Gateway = EPaymentGateway.Stripe,
                 Number = Guid.NewGuid().ToString()[0..8],
                 Status = EOrderStatus.WaitingPayment,
-                UpdatedAt = DateTime.Now
+                LastUpdatedAt = DateTime.Now
             };
 
             await context.Orders.AddAsync(order);
@@ -73,7 +73,7 @@ public class OrderHandler(
             return new Response<Order?>(null, 400, "Este pedido ainda não foi pago");
 
         order.Status = EOrderStatus.Paid;
-        order.UpdatedAt = DateTime.Now;
+        order.LastUpdatedAt = DateTime.Now;
         order.ExternalReference = charge.Id;
 
         context.Orders.Update(order);

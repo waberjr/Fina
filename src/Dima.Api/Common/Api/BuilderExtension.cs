@@ -1,4 +1,6 @@
+using Dima.Api.Common.Identity;
 using Dima.Api.Data;
+using Dima.Api.Data.Interceptors;
 using Dima.Api.Handlers;
 using Dima.Api.Identity;
 using Dima.Api.Models;
@@ -6,6 +8,7 @@ using Dima.Core;
 using Dima.Core.Handlers;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Stripe;
 
 namespace Dima.Api.Common.Api;
@@ -46,12 +49,25 @@ public static class BuilderExtension
     {
         builder
             .Services
-            .AddDbContext<AppDbContext>(
-                x => { x.UseSqlServer(Configuration.ConnectionString); });
+            .AddScoped<ISaveChangesInterceptor, AuditableEntityInterceptor>();
+
+        builder
+            .Services
+            .AddDbContext<AppDbContext>((sp, options) =>
+            {
+                options.AddInterceptors(sp.GetServices<ISaveChangesInterceptor>());
+
+                options.UseSqlServer(Configuration.ConnectionString);
+            });
 
         builder.Services
             .AddScoped<AppDbContextInitializer>();
 
+        builder.Services
+            .AddAuthentication()
+            .AddBearerToken(IdentityConstants.BearerScheme);
+        builder.Services
+            .AddAuthorizationBuilder();
         builder.Services
             .AddIdentityCore<User>()
             .AddRoles<IdentityRole<long>>()
@@ -79,6 +95,10 @@ public static class BuilderExtension
 
     public static void AddServices(this WebApplicationBuilder builder)
     {
+        builder
+            .Services
+            .AddScoped<ICurrentUser, CurrentUser>();
+
         builder
             .Services
             .AddTransient<ICategoryHandler, CategoryHandler>();

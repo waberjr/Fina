@@ -19,6 +19,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
         IdentityUserToken<long>>(options)
 {
     public DbSet<Category> Categories { get; set; } = null!;
+    public DbSet<SubCategory> SubCategories { get; set; } = null!;
     public DbSet<Transaction> Transactions { get; set; } = null!;
     public DbSet<Order> Orders { get; set; } = null!;
 
