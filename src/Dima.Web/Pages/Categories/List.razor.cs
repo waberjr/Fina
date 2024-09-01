@@ -10,9 +10,11 @@ public partial class ListCategoriesPage : ComponentBase
 {
     #region Properties
 
-    public bool IsBusy { get; set; } = false;
-    public List<Category> Categories { get; set; } = [];
-    public string SearchTerm { get; set; } = string.Empty;
+    public bool IsBusy { get; set; }
+    // protected List<Category> Categories { get; set; } = [];
+    // public string SearchTerm { get; set; } = string.Empty;
+
+    public MudDataGrid<Category>? CategoriesGrid;
 
     #endregion
 
@@ -25,7 +27,7 @@ public partial class ListCategoriesPage : ComponentBase
     public IDialogService DialogService { get; set; } = null!;
 
     [Inject]
-    public ICategoryHandler Handler { get; set; } = null!;
+    public ICategoryHandler CategoryHandler { get; set; } = null!;
 
     #endregion
 
@@ -33,13 +35,45 @@ public partial class ListCategoriesPage : ComponentBase
 
     protected override async Task OnInitializedAsync()
     {
+        // IsBusy = true;
+        // try
+        // {
+        //     var request = new GetAllCategoriesRequest();
+        //     var result = await CategoryHandler.GetAllAsync(request);
+        //     if (result.IsSuccess)
+        //         Categories = result.Data ?? [];
+        // }
+        // catch (Exception ex)
+        // {
+        //     Snackbar.Add(ex.Message, Severity.Error);
+        // }
+        // finally
+        // {
+        //     IsBusy = false;
+        // }
+    }
+
+    #endregion
+
+    #region Methods
+
+    protected async Task<GridData<Category>> LoadCategories(GridState<Category> state)
+    {
         IsBusy = true;
         try
         {
-            var request = new GetAllCategoriesRequest();
-            var result = await Handler.GetAllAsync(request);
-            if (result.IsSuccess)
-                Categories = result.Data ?? [];
+            var request = new GetAllCategoriesRequest
+            {
+                PageNumber = state.Page + 1,
+                PageSize = state.PageSize
+            };
+            var result = await CategoryHandler.GetAllAsync(request);
+
+            return new GridData<Category>
+            {
+                Items = result.Data ?? [],
+                TotalItems = result.TotalCount
+            };
         }
         catch (Exception ex)
         {
@@ -49,11 +83,13 @@ public partial class ListCategoriesPage : ComponentBase
         {
             IsBusy = false;
         }
+
+        return new GridData<Category>
+        {
+            Items = [],
+            TotalItems = 0
+        };
     }
-
-    #endregion
-
-    #region Methods
 
     public async void OnDeleteButtonClickedAsync(long id, string title)
     {
@@ -69,13 +105,14 @@ public partial class ListCategoriesPage : ComponentBase
         StateHasChanged();
     }
 
-    public async Task OnDeleteAsync(long id, string title)
+    private async Task OnDeleteAsync(long id, string title)
     {
         try
         {
             var request = new DeleteCategoryRequest { Id = id };
-            await Handler.DeleteAsync(request);
-            Categories.RemoveAll(x => x.Id == id);
+            await CategoryHandler.DeleteAsync(request);
+            // Categories.RemoveAll(x => x.Id == id);
+            CategoriesGrid?.ReloadServerData();
             Snackbar.Add($"Categoria {title} excluída", Severity.Success);
         }
         catch (Exception ex)
@@ -84,23 +121,20 @@ public partial class ListCategoriesPage : ComponentBase
         }
     }
 
-    public Func<Category, bool> Filter => category =>
-    {
-        if (string.IsNullOrWhiteSpace(SearchTerm))
-            return true;
-
-        if (category.Id.ToString().Contains(SearchTerm, StringComparison.OrdinalIgnoreCase))
-            return true;
-
-        if (category.Title.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase))
-            return true;
-
-        if (category.Description is not null &&
-            category.Description.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase))
-            return true;
-
-        return false;
-    };
+    // public Func<Category, bool> Filter => category =>
+    // {
+    //     if (string.IsNullOrWhiteSpace(SearchTerm))
+    //         return true;
+    //
+    //     if (category.Title.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase))
+    //         return true;
+    //
+    //     if (category.Description is not null &&
+    //         category.Description.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase))
+    //         return true;
+    //
+    //     return false;
+    // };
 
     #endregion
 }

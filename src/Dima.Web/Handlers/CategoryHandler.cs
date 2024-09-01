@@ -36,6 +36,6 @@ public class CategoryHandler(IHttpClientFactory httpClientFactory) : ICategoryHa
            ?? new Response<Category?>(null, 400, "Não foi possível obter a categoria");
 
     public async Task<PagedResponse<List<Category>>> GetAllAsync(GetAllCategoriesRequest request)
-        => await _client.GetFromJsonAsync<PagedResponse<List<Category>>>("v1/categories")
+        => await _client.GetFromJsonAsync<PagedResponse<List<Category>>>($"v1/categories?pageNumber={request.PageNumber}&pageSize={request.PageSize}")
            ?? new PagedResponse<List<Category>>(null, 400, "Não foi possível obter as categorias");
 }
